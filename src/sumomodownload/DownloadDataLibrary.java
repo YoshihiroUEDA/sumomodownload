@@ -12,15 +12,15 @@ public class DownloadDataLibrary {
 //			{"http://sumomo-ch.com/blog-entry-1753.html","加藤リナのメガネお姉さんなエロ画像 37枚"}
 //			,{"http://sumomo-ch.com/blog-entry-1404.html", "加藤リナ ちっぱい水着画像 70枚"}
 //			,{"http://sumomo-ch.com/blog-entry-1355.html","加藤リナの引退が惜しまれるヌード画像 50枚"},
-			{"http://sumomo-ch.com/blog-entry-4198.html#more","白石茉莉奈 癒やしとエロさのヌード画像"},
-			{	"http://sumomo-ch.com/blog-entry-3225.html", "白石茉莉奈 ムチムチなエロボディ画像"},
-			{"http://sumomo-ch.com/blog-entry-2420.html","白石茉莉奈 AV女優画像 170枚"},
-			{"http://sumomo-ch.com/blog-entry-1705.html","白石茉莉奈のAV作品画像 107枚"},
-			{"http://sumomo-ch.com/blog-entry-1192.html","【元芸能人】白石茉莉奈AVデビュー 画像50枚【ママドル】"},
-			{"http://sumomo-ch.com/blog-entry-4245.html","北野のぞみ 初の生中出しAVに出演"},
-			{"http://sumomo-ch.com/blog-entry-1954.html#more","麻倉憂の可愛すぎるヌード画像 78枚"},
-			{"http://sumomo-ch.com/blog-entry-1497.html#more","麻倉憂がカリビアンコムで復帰！画像62枚"},
-			{"http://sumomo-ch.com/blog-entry-1174.html#more","【引退】麻倉憂を若妻に貰ったら…妄想エッチ画像70枚【見納め】"}
+//			{"http://sumomo-ch.com/blog-entry-4198.html#more","白石茉莉奈 癒やしとエロさのヌード画像"},
+//			{	"http://sumomo-ch.com/blog-entry-3225.html", "白石茉莉奈 ムチムチなエロボディ画像"},
+//			{"http://sumomo-ch.com/blog-entry-2420.html","白石茉莉奈 AV女優画像 170枚"},
+//			{"http://sumomo-ch.com/blog-entry-1705.html","白石茉莉奈のAV作品画像 107枚"},
+//			{"http://sumomo-ch.com/blog-entry-1192.html","【元芸能人】白石茉莉奈AVデビュー 画像50枚【ママドル】"},
+//			{"http://sumomo-ch.com/blog-entry-4245.html","北野のぞみ 初の生中出しAVに出演"},
+//			{"http://sumomo-ch.com/blog-entry-1954.html#more","麻倉憂の可愛すぎるヌード画像 78枚"},
+//			{"http://sumomo-ch.com/blog-entry-1497.html#more","麻倉憂がカリビアンコムで復帰！画像62枚"},
+//			{"http://sumomo-ch.com/blog-entry-1174.html#more","【引退】麻倉憂を若妻に貰ったら…妄想エッチ画像70枚【見納め】"}
 
 	};
 
