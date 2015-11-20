@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class TJpegFileDownloader {
+public class TJpegFileDownloader  extends TDebug{
 	public TJpegFileDownloader(String downloadFileURL, String downloadFolderName, String refere) {
 		File f = new File(downloadFolderName);
 		if (!f.exists()) {
@@ -23,23 +23,9 @@ public class TJpegFileDownloader {
 		String filename = words[words.length - 1];
 		String saveFilename = downloadFolderName + System.getProperty("file.separator")
 				+ System.getProperty("file.separator") + filename;
-		System.out.println("save filename:" + saveFilename);
+		dPrintln("save filename:" + saveFilename);
 
-		f = new File(saveFilename);
-		if (f.exists()) {
-			//	rename処理が必要
-			String temp=null;
-			for(int i =0; i<10;i++){
-				temp = saveFilename.replace(".jpg", i+".jpg");
-				File tempFile = new File( temp);
-				if ( !f.exists())break;
-			}
-			System.out.println("src: "+ saveFilename);
-			System.out.println("dest:"+ temp);
-
-			//			System.out.println("file exists.");
-//			System.exit(-1);
-		}
+		f = renameDuplicateFilename(saveFilename);
 		try {
 			url = new URL(downloadFileURL);
 			urlcon = (HttpURLConnection) url.openConnection();
@@ -81,37 +67,61 @@ public class TJpegFileDownloader {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-//		filecleaner(downloadFolderName);
+		// filecleaner(downloadFolderName);
 
 	}
 
+	private File renameDuplicateFilename(String saveFilename) {
+		File f;
+		f = new File(saveFilename);
+		if (f.exists()) {
+			// rename処理が必要
+			String temp = null;
+			for (int i = 0; i < 10; i++) {
+				temp = saveFilename.replace(".jpg", i + ".jpg");
+				File tempFile = new File(temp);
+				if (!f.exists())
+					break;
+			}
+			dPrintln("src: " + saveFilename);
+			dPrintln("dest:" + temp);
+
+			// System.out.println("file exists.");
+			// System.exit(-1);
+		}
+		return f;
+	}
+
 	public void filecleaner(String downloadFolderName) {
-		System.out.println("縮小版ファイルの移動");
+		
+		setDebugFlag(false);
+		
+		dPrintln("縮小版ファイルの移動");
 
-		String multipleFolder="縮小版";
-		String strSeparator=System.getProperty("file.separator");
-		String smallPicFolder = downloadFolderName+strSeparator+multipleFolder;
+		String multipleFolder = "縮小版";
+		String strSeparator = System.getProperty("file.separator");
+		String smallPicFolder = downloadFolderName + strSeparator + multipleFolder;
 
-		File f1= new File( downloadFolderName);
+		File f1 = new File(downloadFolderName);
 		//
-		File f2=new File(smallPicFolder);
-		if (!f2.exists()){
+		File f2 = new File(smallPicFolder);
+		if (!f2.exists()) {
 			f2.mkdir();
 		}
 
 		File[] fs = f1.listFiles();
-		for (int i=0; i<fs.length;i++){
+		for (int i = 0; i < fs.length; i++) {
 			String filename1 = fs[i].getName();
-			if(filename1.indexOf("s.jpg")>=0){	//	縮小版ファイルがあった
-				File FileMoveToName=null;
-				System.out.println(fs[i].getPath());
-				System.out.println(fs[i].getParent());
-				System.out.println(fs[i].getName());
-				String moveToFolderName = fs[i].getParent()+strSeparator+multipleFolder;
-				String moveToFilename=moveToFolderName+strSeparator+fs[i].getName();
-				File fdest =new File( moveToFilename);
+			if (filename1.indexOf("s.jpg") >= 0) { // 縮小版ファイルがあった
+				File FileMoveToName = null;
+				dPrintln(fs[i].getPath());
+				dPrintln(fs[i].getParent());
+				dPrintln(fs[i].getName());
+				String moveToFolderName = fs[i].getParent() + strSeparator + multipleFolder;
+				String moveToFilename = moveToFolderName + strSeparator + fs[i].getName();
+				File fdest = new File(moveToFilename);
 				fs[i].renameTo(fdest);
-//				System.exit(-1);
+				// System.exit(-1);
 			}
 
 		}

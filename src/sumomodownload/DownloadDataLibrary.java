@@ -20,7 +20,8 @@ public class DownloadDataLibrary {
 //			{"http://sumomo-ch.com/blog-entry-4245.html","北野のぞみ 初の生中出しAVに出演"},
 //			{"http://sumomo-ch.com/blog-entry-1954.html#more","麻倉憂の可愛すぎるヌード画像 78枚"},
 //			{"http://sumomo-ch.com/blog-entry-1497.html#more","麻倉憂がカリビアンコムで復帰！画像62枚"},
-//			{"http://sumomo-ch.com/blog-entry-1174.html#more","【引退】麻倉憂を若妻に貰ったら…妄想エッチ画像70枚【見納め】"}
+//			{"http://sumomo-ch.com/blog-entry-1174.html#more","【引退】麻倉憂を若妻に貰ったら…妄想エッチ画像70枚【見納め】"},
+			{"http://g.e-hentai.org/g/869533/56bf16d0ec/", "[守矢ギア] 姉憑き"}
 
 	};
 
