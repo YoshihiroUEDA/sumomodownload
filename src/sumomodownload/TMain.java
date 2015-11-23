@@ -7,13 +7,14 @@ import java.util.ArrayList;
 public class TMain extends TDebug {
 	public static void main(String args[]) {
 		System.out.println("Program start....");
+
 		new TMain();
 		System.out.println("Program terminated.");
 
 	}
 
 	public TMain() {
-
+		setDebugAll(false);
 		// ダウンロードの要素を持った配列
 		DownloadDataLibrary obj = new DownloadDataLibrary();
 
@@ -33,14 +34,13 @@ public class TMain extends TDebug {
 				}
 			}
 
-
 			try {
 				String line = obj.getUrl(kk);
 				if (line.indexOf("e-hentai") >= 0) {
 
 					setDebugFlag(true);
 					dPrintln("e-hentai");
-					TEHentai hen =new TEHentai(obj.getUrl(kk), saveFolderName, storeSpaceName);
+					TEHentai hen = new TEHentai(obj.getUrl(kk), saveFolderName, storeSpaceName);
 					hen.doDownload();
 					setDebugFlag(false);
 
