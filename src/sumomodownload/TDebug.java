@@ -30,5 +30,12 @@ public class TDebug {
 			System.out.print(str);
 		}
 	}
+	public void cout( String str){
+		System.out.print(str);
+
+	}
+	public void  coutln ( String s ){
+		System.out.println( s);
+	}
 
 }

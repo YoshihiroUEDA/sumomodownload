@@ -37,11 +37,18 @@ public class TMain extends TDebug {
 			try {
 				String line = obj.getUrl(kk);
 				if (line.indexOf("e-hentai") >= 0) {
+//
+//					 setDebugFlag(true);
+//					 dPrintln("e-hentai");
+//					 TEHentai hen = new TEHentai(obj.getUrl(kk),
+//					 saveFolderName, storeSpaceName);
+//					 hen.doDownload();
+//					 setDebugFlag(false);
 
 					setDebugFlag(true);
-					dPrintln("e-hentai");
-					TEHentai hen = new TEHentai(obj.getUrl(kk), saveFolderName, storeSpaceName);
-					hen.doDownload();
+					dPrintln("e-hentai download");
+					TEHentai2 obj1 = new TEHentai2(line, saveFolderName);
+
 					setDebugFlag(false);
 
 				} else {
