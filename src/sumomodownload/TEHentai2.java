@@ -35,6 +35,7 @@ class TEHentaiDownloaderForJpeg extends TDebug {
  *
  */
 class TEHentaiDownloaderForHTML extends TDebug {
+	private static final String TD_CLASS_PTDD_LT = "<td class=\"ptdd\">&lt;";
 	private static final String URL_IDENTIFIRE_STRING = "http://";
 	private static final String URL_SUBPAGE_STRING = "http://g.e-hentai.org/s";
 	private static final String HTTP_PREFIX = "http://";
@@ -85,6 +86,19 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		for (int x = 0; x < listSumneil.size(); x++) {
 			TEHentaiDownloaderForHTML obj = new TEHentaiDownloaderForHTML(listSumneil.get(x), saveFolder);
 		}
+		//	2枚目以降のページの取得(ただし、同じページのリンクは除外
+		for (int kx=0; kx<list.size(); kx++){
+
+			if( list.get(kx).indexOf(TD_CLASS_PTDD_LT)>=0	){
+				String [] words = list.get(kx)	.split("</td>");
+				for (int kxx=0; kxx<words.length; kxx++){
+					if ( words[kxx].indexOf(TD_CLASS_PTDD_LT)>=0){
+						coutln("target found<"+words[kxx].indexOf(TD_CLASS_PTDD_LT)+">:" + words[kxx]	);
+					}
+				}
+			}
+		}
+
 		setDebugFlag(true);
 		for (int k = 0; k < urllist.size(); k++) {
 			dPrintln(k + ":" + urllist.get(k));
@@ -205,13 +219,13 @@ class TEHentaiDownloaderForHTML extends TDebug {
 					urllist.add(words[j]);
 
 				}
-				if (words[j].indexOf("http://g.e-hentai.org/g/") >= 0) {
-//					for ( int xx =0 ; xx<words.length; xx++){
-//						if ( words[xx].equals(words[j]))break;
-//					}
-					coutln("->>" + words[j] + "<<");
-					listSumneil.add(words[j]);
-				}
+//				if (words[j].indexOf("http://g.e-hentai.org/g/") >= 0) {
+////					for ( int xx =0 ; xx<words.length; xx++){
+////						if ( words[xx].equals(words[j]))break;
+////					}
+//					coutln("->>" + words[j] + "<<");
+//					listSumneil.add(words[j]);
+//				}
 			}
 		}
 	}
