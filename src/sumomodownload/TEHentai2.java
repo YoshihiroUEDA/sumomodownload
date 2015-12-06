@@ -19,7 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 public class TEHentai2 extends TDebug {
+	/**
+	 * 
+	 * @param URLAddress ダウンロードのURL
+	 * @param SaveFolder 保存場所
+	 */
 	public TEHentai2(String URLAddress, String SaveFolder) {
+		//	ダウンロード処理
 		TEHentaiDownloaderForHTML obj = new TEHentaiDownloaderForHTML(URLAddress, SaveFolder);
 		// obj.downloadFile();
 
@@ -43,6 +49,15 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	ArrayList<String> _urlList = null;
 	ArrayList<String> listSumneil = new ArrayList<String>();
 
+	/**
+	 * コンストラクタ
+	 * 一覧の格納されたページと保存場所を指定される
+	 * 
+	 * ※複数ページ分割に対応していない（２０１５．１２．０７）
+	 * 
+	 * @param targetURL
+	 * @param saveFolder
+	 */
 	public TEHentaiDownloaderForHTML(String targetURL, String saveFolder) {
 		ArrayList<String> list = new ArrayList<>();
 		coutln("TEHentaiDownloaderForHTML() constructor start...");
@@ -117,7 +132,14 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		}
 
 	}
-
+	/**
+	 * サブページのダウンロード
+	 * 
+	 * @param pageURL			このページの中からダウンロードを行う
+	 * @param reffereFromURL	リファラの指定
+	 * @param SaveFolder		保存場所
+	 * @throws IOException
+	 */
 	private void downloadSubpage(String pageURL, String reffereFromURL, String SaveFolder) throws IOException {
 		coutln("downloadSubpage() start.");
 
@@ -144,16 +166,19 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 
 	/**
+	 * ファイルのダウンロード処理
+	 * 
 	 * @author 吉祥
-	 * @param saveFolder
-	 * @param pageURL
-	 * @param imageURL
+	 * @param saveFolder	保存フォルダ
+	 * @param pageURL		画像ページのURL；参照元のURL（リファラとして設定）
+	 * @param imageURL		画像ファイルのアドレス
 	 * @throws IOException
 	 *
 	 *
 	 */
 	public void downloadFile(String imageURL, String pageURL, String saveFolder) throws IOException {
 		// TODO 自動生成されたメソッド・スタブ
+		
 		URL url = new URL(imageURL);
 		HttpURLConnection urlcon = (HttpURLConnection) url.openConnection();
 		urlcon.setRequestMethod("GET");
@@ -203,7 +228,12 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		}
 
 	}
-
+	/**
+	 * サブページのURLを抽出してリストを作成する
+	 * 
+	 * @param list		元のHTML文が格納；解析対象
+	 * @param urllist	サブページとして発見されたURL
+	 */
 	private void pickupURLString(ArrayList<String> list, ArrayList<String> urllist) {
 		for (int i = 0; i < list.size(); i++) {
 			String line = list.get(i);
@@ -229,7 +259,18 @@ class TEHentaiDownloaderForHTML extends TDebug {
 			}
 		}
 	}
-
+	/**
+	 * 
+	 * ？？
+	 * 
+	 * 
+	 * @param targetURL
+	 * @param reffere
+	 * @param saveFolder
+	 * @throws MalformedURLException
+	 * @throws ProtocolException
+	 * @throws IOException
+	 */
 	public TEHentaiDownloaderForHTML(String targetURL, String reffere, String saveFolder)
 			throws MalformedURLException, ProtocolException, IOException {
 		// 保存先フォルダのチェック
@@ -254,7 +295,11 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		closeConnection(urlcon, br);
 
 	}
-
+	/**
+	 * フォルダの有無をチェックし、なければ作成する
+	 * 
+	 * @param saveFolder
+	 */
 	private void checkFolderExist(String saveFolder) {
 		File f = new File(saveFolder);
 		if (!f.exists()) {
@@ -264,12 +309,26 @@ class TEHentaiDownloaderForHTML extends TDebug {
 			}
 		}
 	}
-
+	/**
+	 * コネクションを閉じる
+	 * 
+	 * @param urlcon
+	 * @param br
+	 * @throws IOException
+	 */
 	private void closeConnection(HttpURLConnection urlcon, BufferedReader br) throws IOException {
 		br.close();
 		urlcon.disconnect();
 	}
-
+	/**
+	 * コネクションを張る
+	 * 
+	 * @param targetURL
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ProtocolException
+	 */
 	private HttpURLConnection openConnection(String targetURL)
 			throws MalformedURLException, IOException, ProtocolException {
 		URL url;
@@ -283,7 +342,16 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		openConnectionParameterRead(urlcon);
 		return urlcon;
 	}
-
+	/**
+	 * コネクションを張る
+	 * 
+	 * @param targetURL
+	 * @param reffere
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ProtocolException
+	 */
 	private HttpURLConnection openConnection(String targetURL, String reffere)
 			throws MalformedURLException, IOException, ProtocolException {
 		URL url;
@@ -302,7 +370,10 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		openConnectionParameterRead(urlcon);
 		return urlcon;
 	}
-
+	/**
+	 * 接続したこhttpコネクションのパラメータを読み取る
+	 * @param urlcon
+	 */
 	private void openConnectionParameterRead(HttpURLConnection urlcon) {
 		Map<String, List<String>> headers = urlcon.getHeaderFields();
 		Iterator it = headers.keySet().iterator();
@@ -312,7 +383,13 @@ class TEHentaiDownloaderForHTML extends TDebug {
 
 		}
 	}
-
+	/**
+	 * コネクションの接続を行う
+	 * @param targetURL
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
 	private HttpURLConnection openConnectionPre(String targetURL) throws MalformedURLException, IOException {
 		URL url;
 		HttpURLConnection urlcon;
