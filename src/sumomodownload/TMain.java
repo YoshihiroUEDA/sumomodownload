@@ -47,7 +47,7 @@ public class TMain extends TDebug {
 
 					setDebugFlag(true);
 					dPrintln("e-hentai download");
-					TEHentai2 obj1 = new TEHentai2(line, saveFolderName);
+					TEHentai3 obj1 = new TEHentai3(line, saveFolderName);
 
 					setDebugFlag(false);
 

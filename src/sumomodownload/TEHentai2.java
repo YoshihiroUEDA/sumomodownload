@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class TEHentai2 extends TDebug {
 	/**
-	 * 
+	 *
 	 * @param URLAddress ダウンロードのURL
 	 * @param SaveFolder 保存場所
 	 */
@@ -52,9 +52,9 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	/**
 	 * コンストラクタ
 	 * 一覧の格納されたページと保存場所を指定される
-	 * 
+	 *
 	 * ※複数ページ分割に対応していない（２０１５．１２．０７）
-	 * 
+	 *
 	 * @param targetURL
 	 * @param saveFolder
 	 */
@@ -134,7 +134,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 	/**
 	 * サブページのダウンロード
-	 * 
+	 *
 	 * @param pageURL			このページの中からダウンロードを行う
 	 * @param reffereFromURL	リファラの指定
 	 * @param SaveFolder		保存場所
@@ -143,7 +143,14 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	private void downloadSubpage(String pageURL, String reffereFromURL, String SaveFolder) throws IOException {
 		coutln("downloadSubpage() start.");
 
-		URL url = new URL(pageURL);
+		URL url =null;
+		try{
+			url = new URL(pageURL);
+		}catch(MalformedURLException e){
+			coutln("url object create error : " + pageURL);
+			coutln("download skip.");
+			return ;
+		}
 		HttpURLConnection urlcon = (HttpURLConnection) url.openConnection();
 		urlcon.setRequestMethod("GET");
 		urlcon.setInstanceFollowRedirects(false);
@@ -167,7 +174,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 
 	/**
 	 * ファイルのダウンロード処理
-	 * 
+	 *
 	 * @author 吉祥
 	 * @param saveFolder	保存フォルダ
 	 * @param pageURL		画像ページのURL；参照元のURL（リファラとして設定）
@@ -178,7 +185,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	 */
 	public void downloadFile(String imageURL, String pageURL, String saveFolder) throws IOException {
 		// TODO 自動生成されたメソッド・スタブ
-		
+
 		URL url = new URL(imageURL);
 		HttpURLConnection urlcon = (HttpURLConnection) url.openConnection();
 		urlcon.setRequestMethod("GET");
@@ -230,7 +237,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 	/**
 	 * サブページのURLを抽出してリストを作成する
-	 * 
+	 *
 	 * @param list		元のHTML文が格納；解析対象
 	 * @param urllist	サブページとして発見されたURL
 	 */
@@ -260,10 +267,10 @@ class TEHentaiDownloaderForHTML extends TDebug {
 		}
 	}
 	/**
-	 * 
+	 *
 	 * ？？
-	 * 
-	 * 
+	 *
+	 *
 	 * @param targetURL
 	 * @param reffere
 	 * @param saveFolder
@@ -297,7 +304,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 	/**
 	 * フォルダの有無をチェックし、なければ作成する
-	 * 
+	 *
 	 * @param saveFolder
 	 */
 	private void checkFolderExist(String saveFolder) {
@@ -311,7 +318,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 	/**
 	 * コネクションを閉じる
-	 * 
+	 *
 	 * @param urlcon
 	 * @param br
 	 * @throws IOException
@@ -322,7 +329,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 	/**
 	 * コネクションを張る
-	 * 
+	 *
 	 * @param targetURL
 	 * @return
 	 * @throws MalformedURLException
@@ -344,7 +351,7 @@ class TEHentaiDownloaderForHTML extends TDebug {
 	}
 	/**
 	 * コネクションを張る
-	 * 
+	 *
 	 * @param targetURL
 	 * @param reffere
 	 * @return
