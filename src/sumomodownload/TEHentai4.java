@@ -5,9 +5,11 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -30,7 +32,7 @@ public class TEHentai4 extends TMyDebug {
 	static public void main(String[] args) {
 		new TMain();
 	}
-	
+
 	/**
 	 *
 	 * @param _url
@@ -54,24 +56,28 @@ public class TEHentai4 extends TMyDebug {
 		// DownloadItem item = new DownloadItem("[由浦カズヤ] きざし 第1-6話",
 		// "http://g.e-hentai.org/g/884956/e64405aedb/");
 		DownloadItem item = new DownloadItem("[しんば鷹史] 裸の湿度", "http://g.e-hentai.org/g/884896/7e9ffef386/");
-		
+
 		downloadFilesFromURL(item);
 
 		coutln("program terminated.");
 	}
 
 	private void downloadFilesFromURL(DownloadItem item) {
+		coutln("downloadFilesFromURL() start.");
+
 		URL url;
 		HttpURLConnection urlcon;
 		File file;
 		String outputFolder = System.getProperty("user.home") + System.getProperty("file.separator") + "OneDrive"
 				+ System.getProperty("file.separator") + item.getName();
+
 		coutln( "item.getName() : "+ item.getName());
 		coutln( "outputFolder = " + outputFolder);
+
 		file = new File(outputFolder);
 		if (!file.exists()) {
 			if (!file.mkdir()) {
-				coutln("save folder created.");
+				coutln("save folder ["+outputFolder+"] created.");
 			}
 		}
 		try {
@@ -129,8 +135,16 @@ public class TEHentai4 extends TMyDebug {
 		urlcon.setRequestMethod("GET");
 		urlcon.setInstanceFollowRedirects(true);
 		urlcon.setAllowUserInteraction(false);
+		try{
 		urlcon.connect();
+		}catch (ConnectException e){
+			coutln("connect exception process skip.");
+			urlcon.disconnect();
+			urlcon=null;
 
+			return;
+
+		}
 		int httpStatusCode = urlcon.getResponseCode();
 		if (HttpURLConnection.HTTP_OK != httpStatusCode) {
 			coutln("connect error");
@@ -140,7 +154,7 @@ public class TEHentai4 extends TMyDebug {
 		File f = new File(outputFolder);
 		if (!f.exists() || !f.isDirectory()) {
 			// フォルダが存在しない
-
+//			f.mkdir();
 			return;
 		}
 		String workname = outputFolder + System.getProperty("file.separator") + filename;
@@ -150,12 +164,20 @@ public class TEHentai4 extends TMyDebug {
 			File fileBackupName = new File(outputFolder + System.getProperty("file.separator") + "backup_" + filename);
 			if (fileBackupName.exists()) {
 				fileBackupName.delete();
+				coutln("file delete.");
 			}
 			file.renameTo(fileBackupName);
 
 		}
 		DataInputStream dis = new DataInputStream(urlcon.getInputStream());
-		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+		DataOutputStream dos=null;
+		try{dos= new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));}catch( FileNotFoundException e){
+			dis.close();
+			dis=null;
+			urlcon.disconnect();
+			urlcon=null;
+			return;
+		}
 		byte[] buff = new byte[4096];
 		int readByte = 0, totalSize = 0;
 		while (-1 != (readByte = dis.read(buff))) {
@@ -165,6 +187,7 @@ public class TEHentai4 extends TMyDebug {
 		if (0 == totalSize) {
 			file.delete();
 		} else {
+
 			coutln("file size = " + totalSize);
 		}
 		dos.flush();
@@ -173,7 +196,11 @@ public class TEHentai4 extends TMyDebug {
 		dis.close();
 		dis = null;
 		urlcon.disconnect();
-		urlcon = null;
+		urlcon = null; if ( totalSize < 1000) {
+			coutln( "small size picture delete.");
+			file.delete();
+
+		}
 	}
 
 	private void httpDownload2ndStage(ArrayList<String> list, ArrayList<String> listSubPage)
