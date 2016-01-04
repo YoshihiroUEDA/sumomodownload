@@ -13,8 +13,12 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 全て作り直し
@@ -23,11 +27,15 @@ import java.util.ArrayList;
  *
  */
 public class TEHentai4 extends TMyDebug {
-
+	public static final String LOGFILE = "Logger.txt"; // Log file.
+	private static final String THIS_IS_WARNING_CONTENTS = "This gallery has been flagged as <strong>Offensive For Everyone</strong>. Due to its content, it should not be viewed by anyone.";
 	private static final String CONST_QUOTE_SET = "[\"']";
 	private static final String CONST_QUOTE = "\"";
 	private static final String PREFIX_HTTP = "http";
 	private static final String PREFOX_SUB_PAGE = "http://g.e-hentai.org/s";
+	private static final String PREFIX_SUB_PAGE_MAIN = "http://g.e-hentai.org/g/";
+
+	private Logger logger = null;
 
 	static public void main(String[] args) {
 		new TMain();
@@ -39,6 +47,23 @@ public class TEHentai4 extends TMyDebug {
 	 * @param _saveFolder
 	 */
 	public TEHentai4(String _url, String _saveFolder) {
+		logger = Logger.getLogger(this.getClass().getName());
+		FileHandler fh = null;
+		try {
+			fh = new FileHandler(LOGFILE, true);
+			fh.setFormatter(new java.util.logging.SimpleFormatter());
+
+		} catch (SecurityException | IOException e) {
+			// TODO 自動生成された catch ブロック
+			logger.info(this.getClass().getName() + " Constructor error.");
+			e.printStackTrace();
+
+		}
+		logger.addHandler(fh);
+		logger.setLevel(Level.INFO);
+
+		logger.info("TEHentai4() start.");
+
 		DownloadItem item = new DownloadItem(_saveFolder, _url);
 		downloadFilesFromURL(item);
 	}
@@ -63,28 +88,32 @@ public class TEHentai4 extends TMyDebug {
 	}
 
 	private void downloadFilesFromURL(DownloadItem item) {
-		coutln("downloadFilesFromURL() start.");
+		logger.info("downloadFilesFromURL() start.");
 
 		URL url;
 		HttpURLConnection urlcon;
 		File file;
 		String outputFolder = System.getProperty("user.home") + System.getProperty("file.separator") + "OneDrive"
-				+ System.getProperty("file.separator") + item.getName();
+				+ System.getProperty("file.separator") + "comic-private" + System.getProperty("file.separator")
+				+ item.getName();
 
-		coutln( "item.getName() : "+ item.getName());
-		coutln( "outputFolder = " + outputFolder);
+		logger.info("item.getName() : " + item.getName());
+		logger.info("outputFolder = " + outputFolder);
 
 		file = new File(outputFolder);
 		if (!file.exists()) {
 			if (!file.mkdir()) {
-				coutln("save folder ["+outputFolder+"] created.");
+				logger.info("save folder [" + outputFolder + "] created.");
 			}
 		}
+		logger.info("HTML download phase.");
 		try {
 			ArrayList<String> list = httpDownload1stStage(item);
 			ArrayList<String> listSubPage = new ArrayList<>();
 
-			httpDownload2ndStage(list, listSubPage);
+			httpDownload2ndStage(list, listSubPage, item.getUrlString());
+
+			logger.info("subpage contents download");
 
 			for (int i = 0; i < listSubPage.size(); i++) {
 				url = new URL(listSubPage.get(i));
@@ -92,10 +121,16 @@ public class TEHentai4 extends TMyDebug {
 				urlcon.setRequestMethod("GET");
 				urlcon.setAllowUserInteraction(false);
 				urlcon.connect();
+				logger.info("http status code=" + urlcon.getResponseCode());
 
 				BufferedReader br = new BufferedReader(new InputStreamReader(urlcon.getInputStream()));
 				String line;
 				while (null != (line = br.readLine())) {
+					// logger.info(line);
+					if (line.indexOf(THIS_IS_WARNING_CONTENTS) >= 0) {
+						logger.info("グロページの発見画面に遭遇");
+
+					}
 					String words[] = line.split(CONST_QUOTE_SET);
 					for (int xx = 0; xx < words.length; xx++) {
 						if (words[xx].indexOf("http://g.e-hentai.org/?f_shash") >= 0)
@@ -104,8 +139,8 @@ public class TEHentai4 extends TMyDebug {
 							coutln("words[" + xx + "]=" + words[xx]);
 							String fileParts[] = words[xx].split("/");
 							String filename = fileParts[fileParts.length - 1];
-							coutln("filename = " + filename);
-							downloadImage(words, xx, outputFolder, filename);
+							logger.info("filename = " + filename);
+							downloadImage2(words, xx, outputFolder, filename);
 						}
 					}
 				}
@@ -119,6 +154,129 @@ public class TEHentai4 extends TMyDebug {
 		}
 	}
 
+	private void downloadImage2(String[] words, int xx, String outputFolder, String filename)
+			throws MalformedURLException, IOException {
+		logger.info("downloadImage2() start...");
+
+		logger.info("出力先フォルダのチェック starting...");
+		File f = new File(outputFolder);
+		if (!f.exists()) {
+			logger.info("出力先フォルダが存在しない");
+			logger.warning("cannot download file:" + filename);
+			return;
+		}
+
+		logger.info("出力ファイル名の重複チェック starting...");
+		String tempFilename = outputFolder + System.getProperty("file.separator");
+		String workname = tempFilename + filename;
+		f = new File(workname);
+		if (f.exists()) {
+			logger.info("出力ファイル名が存在します。");
+			String[] fFilename = filename.split("\\.");
+			logger.info("(ベースネームと拡張子で２が出ればOK) = " + fFilename.length);
+
+			String baseFilename = fFilename[0];
+			String filenameExt = fFilename[1];
+			int i = 0;
+			do {
+				String worknametemp = new String(tempFilename + i + "_" + baseFilename + "." + filenameExt);
+				logger.info(worknametemp);
+				File ff = new File(worknametemp);
+				if (!ff.exists())
+					break;
+				i++;
+			} while (true);
+			logger.info("old filename = " + f.getPath());
+			f = new File(new String(tempFilename + i + "_" + baseFilename + "." + filenameExt));
+			logger.info("new filename = " + f.getPath());
+
+		}
+
+		logger.info("ネットワーク接続処理 starting....");
+		URL imageURL = new URL(words[xx]);
+		HttpURLConnection urlcon = (HttpURLConnection) imageURL.openConnection();
+		urlcon.setRequestMethod("GET");
+		urlcon.setInstanceFollowRedirects(true);
+		urlcon.setAllowUserInteraction(false);
+		try {
+			urlcon.connect();
+		} catch (ConnectException e) {
+			logger.info("connection error.");
+			urlcon.disconnect();
+			urlcon = null;
+			logger.warning("cannot download file: " + filename);
+
+			return;
+		}
+		int httpStatusCode = 0;
+		try {
+			httpStatusCode = urlcon.getResponseCode();
+		} catch (SocketException e) {
+			logger.warning("getResponseCode(); error:");
+			logger.info(e.toString());
+		}
+		if (HttpURLConnection.HTTP_OK != httpStatusCode) {
+			logger.warning("connect error");
+			urlcon.disconnect();
+			urlcon = null;
+			logger.warning("cannot download file:" + filename);
+
+			return;
+		}
+		logger.info("ダウンロードストリームの設定 starting...");
+		DataInputStream dis = new DataInputStream(urlcon.getInputStream());
+		DataOutputStream dos = null;
+		try {
+			dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+		} catch (FileNotFoundException e) {
+			dis.close();
+			dis = null;
+			urlcon.disconnect();
+			urlcon = null;
+			logger.warning("cannot download file: " + filename);
+
+			return;
+		}
+
+		logger.info("download loop starting...");
+		byte[] buff = new byte[4096];
+		int readByte = 0, totalSize = 0;
+		try {
+
+			while (-1 != (readByte = dis.read(buff))) {
+				dos.write(buff, 0, readByte);
+				totalSize += readByte;
+			}
+		} catch (SocketException e) {
+			coutln("socketException coase.");
+			coutln("skip process.");
+		}
+
+		logger.info("close process starting...");
+		dos.flush();
+		dos.close();
+		dos = null;
+		dis.close();
+		dis = null;
+		urlcon.disconnect();
+		urlcon = null;
+		logger.info("(249)Filename = " + f.getPath() + ",  totalSize = " + totalSize);
+		if (0 == totalSize) {
+			f.delete();
+		} else {
+
+			coutln("(254)file size = " + totalSize);
+		}
+
+		if (totalSize < 1000) {
+			coutln("small size picture delete.");
+			logger.info(f.getName() + "is delete.");
+			f.delete();
+
+		}
+
+	}
+
 	/**
 	 *
 	 * @param words
@@ -130,81 +288,131 @@ public class TEHentai4 extends TMyDebug {
 	 */
 	private void downloadImage(String[] words, int xx, String outputFolder, String filename)
 			throws MalformedURLException, IOException {
+		logger.info("downloadImage() start");
+
 		URL imageURL = new URL(words[xx]);
 		HttpURLConnection urlcon = (HttpURLConnection) imageURL.openConnection();
 		urlcon.setRequestMethod("GET");
 		urlcon.setInstanceFollowRedirects(true);
 		urlcon.setAllowUserInteraction(false);
-		try{
-		urlcon.connect();
-		}catch (ConnectException e){
+		try {
+			urlcon.connect();
+		} catch (ConnectException e) {
 			coutln("connect exception process skip.");
+			logger.info("connection exception occured. process skip.");
 			urlcon.disconnect();
-			urlcon=null;
+			urlcon = null;
 
 			return;
 
 		}
 		int httpStatusCode = urlcon.getResponseCode();
+		logger.info("httpStatusCode = " + httpStatusCode);
 		if (HttpURLConnection.HTTP_OK != httpStatusCode) {
-			coutln("connect error");
+			logger.warning("connect error");
 			return;
 		}
 		// フォルダの存在チェック
 		File f = new File(outputFolder);
 		if (!f.exists() || !f.isDirectory()) {
+			logger.info("フォルダが存在しない");
+
 			// フォルダが存在しない
-//			f.mkdir();
+			// f.mkdir();
 			return;
 		}
+		// ファイルの重複チェック
 		String workname = outputFolder + System.getProperty("file.separator") + filename;
-		coutln("workname = " + workname);
+		logger.info("workname = " + workname);
 		File file = new File(workname);
+		// ファイルの重複チェック
 		if (file.exists()) {
-			File fileBackupName = new File(outputFolder + System.getProperty("file.separator") + "backup_" + filename);
-			if (fileBackupName.exists()) {
-				fileBackupName.delete();
-				coutln("file delete.");
-			}
-			file.renameTo(fileBackupName);
+			logger.info("(189)書き出しファイルが存在します");
+
+			int i = 0;
+			File ff;
+			String tempFilename = outputFolder + System.getProperty("file.separator");
+			String[] fFilename = filename.split("\\.");
+			logger.info("fFilename.length = " + fFilename.length);
+
+			String baseFilename = fFilename[0];
+			String filenameExt = fFilename[1];
+
+			do {
+				String worknametemp = new String(tempFilename + i + "_" + baseFilename + "." + filenameExt);
+				ff = new File(worknametemp);
+				if (!ff.exists())
+					break;
+				i++;
+			} while (true);
+			if (i != 0)
+				logger.info("(207)new filename=" + ff.getName());
+
+			file.renameTo(ff);
 
 		}
+		// if (file.exists()) {
+		// logger.info("folder [" + workname + "] is exist.");
+		// File fileBackupName = new File(outputFolder +
+		// System.getProperty("file.separator") + "backup_" + filename);
+		// if (fileBackupName.exists()) {
+		// fileBackupName.delete();
+		// coutln("file delete.");
+		// }
+		// file.renameTo(fileBackupName);
+		//
+		// }
 		DataInputStream dis = new DataInputStream(urlcon.getInputStream());
-		DataOutputStream dos=null;
-		try{dos= new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));}catch( FileNotFoundException e){
+		DataOutputStream dos = null;
+		try {
+			dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+		} catch (FileNotFoundException e) {
 			dis.close();
-			dis=null;
+			dis = null;
 			urlcon.disconnect();
-			urlcon=null;
+			urlcon = null;
 			return;
 		}
 		byte[] buff = new byte[4096];
 		int readByte = 0, totalSize = 0;
-		while (-1 != (readByte = dis.read(buff))) {
-			dos.write(buff, 0, readByte);
-			totalSize += readByte;
-		}
-		if (0 == totalSize) {
-			file.delete();
-		} else {
+		try {
 
-			coutln("file size = " + totalSize);
+			while (-1 != (readByte = dis.read(buff))) {
+				dos.write(buff, 0, readByte);
+				totalSize += readByte;
+			}
+		} catch (SocketException e) {
+			coutln("socketException coase.");
+			coutln("skip process.");
 		}
+
 		dos.flush();
 		dos.close();
 		dos = null;
 		dis.close();
 		dis = null;
 		urlcon.disconnect();
-		urlcon = null; if ( totalSize < 1000) {
-			coutln( "small size picture delete.");
+		urlcon = null;
+		logger.info("(249)Filename = " + file + "totalSize = " + totalSize);
+		if (0 == totalSize) {
+			file.delete();
+		} else {
+
+			coutln("(254)file size = " + totalSize);
+		}
+
+		if (totalSize < 1000) {
+			coutln("small size picture delete.");
+			logger.info(file.getName() + "is delete.");
 			file.delete();
 
 		}
 	}
 
-	private void httpDownload2ndStage(ArrayList<String> list, ArrayList<String> listSubPage)
+	private void httpDownload2ndStage(ArrayList<String> list, ArrayList<String> listSubPage, String urlString)
 			throws MalformedURLException, IOException, ProtocolException {
+		logger.info("httpDownload2ndStage() start..");
+
 		URL url;
 		HttpURLConnection urlcon;
 		for (int lp = 0; lp < list.size(); lp++) {
@@ -213,6 +421,7 @@ public class TEHentai4 extends TMyDebug {
 			urlcon.setRequestMethod("GET");
 			urlcon.setInstanceFollowRedirects(true);
 			urlcon.setAllowUserInteraction(false);
+			urlcon.setRequestProperty("Referer", urlString);
 			urlcon.connect();
 
 			int httpStatusCode = urlcon.getResponseCode();
@@ -220,21 +429,55 @@ public class TEHentai4 extends TMyDebug {
 				coutln("connect error");
 				return;
 			}
-			BufferedReader br = new BufferedReader(new InputStreamReader(urlcon.getInputStream()));
-			while (true) {
-				String line = br.readLine();
-				if (null == line) {
-					break;
 
+			logger.info("data size(HttpURLConnection).getContentLength()=" + urlcon.getContentLength());
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(urlcon.getInputStream()));
+			String line;
+			while (null != (line = br.readLine())) {
+				ArrayList<String> list_subpage = new ArrayList<>();
+				if (line.indexOf(THIS_IS_WARNING_CONTENTS) >= 0) {
+					logger.info("エイダの場合グロページの発見画面");
+					while (null != (line = br.readLine())) {
+						if (line.indexOf("<a href") >= 0) {
+							logger.info("link found.");
+							String ww[] = line.split("<a href");
+							for (int lp1 = 0; lp1 < ww.length; lp1++) {
+								if (ww[lp1].indexOf(PREFIX_HTTP) >= 0) {
+									String[] wqq = ww[lp1].split(CONST_QUOTE);
+									for (int lp2 = 0; lp2 < wqq.length; lp2++) {
+										if (wqq[lp2].indexOf(PREFIX_HTTP) >= 0) {
+											logger.info(wqq[lp2]);
+											// エログロページは特殊処理
+											list_subpage = downloadFilesFromWarningSceeen(wqq[lp2]);
+
+										}
+									}
+
+								}
+							}
+						}
+					}
+					continue;
+				}
+				if (0!=list_subpage.size()) {
+					for (int z = 0; z < list_subpage.size(); z++) {
+						listSubPage.add(list_subpage.get(z));
+					}
 				}
 				String ws[] = line.split("<a href");
 				for (int i = 0; i < ws.length; i++) {
+					// logger.info(ws[i]);
 
 					if (ws[i].indexOf(PREFIX_HTTP) >= 0 && ws[i].indexOf(PREFOX_SUB_PAGE) >= 0) {
 						String ws2[] = ws[i].split(CONST_QUOTE);
+
 						for (int k = 0; k < ws2.length; k++) {
+							// logger.info("-->" + ws2[k]);
+
 							if (ws2[k].indexOf(PREFOX_SUB_PAGE) == 0) {
 								listSubPage.add(ws2[k]);
+								logger.info("url add: " + ws2[k]);
 							}
 						}
 
@@ -249,8 +492,53 @@ public class TEHentai4 extends TMyDebug {
 		}
 	}
 
+	private ArrayList<String> downloadFilesFromWarningSceeen(String urlString) throws IOException {
+		// TODO 自動生成されたメソッド・スタブ
+		logger.info("downloadFilesFromWarningScreen() is starting...");
+		logger.info("urlString:" + urlString);
+		ArrayList<String> list = new ArrayList<>();
+
+		URL url = new URL(urlString);
+		HttpURLConnection urlcon = (HttpURLConnection) url.openConnection();
+		urlcon.setRequestMethod("GET");
+		urlcon.setInstanceFollowRedirects(true);
+		urlcon.setAllowUserInteraction(false);
+
+		urlcon.setRequestProperty("Referer", urlString);
+		urlcon.connect();
+
+		int httpStatusCode = urlcon.getResponseCode();
+		int httpDataSize = urlcon.getContentLength();
+		logger.info("http status code : " + httpStatusCode);
+		logger.info("http content length: " + httpDataSize);
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(urlcon.getInputStream()));
+
+		String line;
+		while (null != (line = br.readLine())) {
+			if (line.indexOf("<a href=") >= 0) {
+				String[] ws = line.split(CONST_QUOTE_SET);
+				for (int qqq = 0; qqq < ws.length; qqq++) {
+					if (ws[qqq].indexOf(PREFIX_SUB_PAGE_MAIN) == 0) {
+						coutln("->" + ws[qqq]);
+						list.add(ws[qqq]);
+					}
+				}
+
+			}
+		}
+		br.close();
+		br = null;
+		urlcon.disconnect();
+		urlcon = null;
+		url = null;
+		return list;
+	}
+
 	private ArrayList<String> httpDownload1stStage(DownloadItem item)
 			throws MalformedURLException, IOException, ProtocolException {
+		logger.info("httpDownload1stStage() starting...");
+
 		URL url;
 		HttpURLConnection urlcon;
 		url = new URL(item.getUrlString());
@@ -333,10 +621,14 @@ class TMyDebug extends TConst {
 class DownloadItem {
 	String name;
 	String urlString;
+
 	/**
 	 * item管理を行うclass
-	 * @param _name	漫画のタイトル
-	 * @param _urlString	漫画のURL
+	 *
+	 * @param _name
+	 *            漫画のタイトル
+	 * @param _urlString
+	 *            漫画のURL
 	 */
 	public DownloadItem(String _name, String _urlString) {
 		name = _name;
