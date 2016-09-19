@@ -1,4 +1,4 @@
-package sumomodownload;
+package util;
 
 public class TDebug {
 	private boolean debugFlag=false;

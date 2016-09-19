@@ -1,4 +1,4 @@
-package sumomodownload;
+package util;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;

@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import util.DownloadDataLibrary;
+import util.TDebug;
+import util.TEHentai4;
+import util.TGetHtmlSource;
+import util.TJpegFileDownloader;
+
 public class TMain extends TDebug {
 	public static void main(String args[]) {
 		System.out.println("Program start....");

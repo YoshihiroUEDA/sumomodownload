@@ -1,4 +1,4 @@
-package sumomodownload;
+package util;
 
 public class DownloadDataLibrary {
 	String myitem[][] = {
@@ -171,11 +171,19 @@ public class DownloadDataLibrary {
 //			{"http://g.e-hentai.org/g/55846/169778b6eb/","[しのざき嶺] 彼氏彼女"},
 //			{"http://g.e-hentai.org/g/55829/97903b2ae6/","[しのざき嶺] D-SHOCK"},
 //			{"http://g.e-hentai.org/g/112338/cc75e495fa/","[しのざき嶺] NIGHT MARE 1"},
-			{"http://g.e-hentai.org/g/112810/76c12ece6e/","[しのざき嶺] NIGHT MARE 2"},
-			{"http://g.e-hentai.org/g/116139/3c9601ce73/","[しのざき嶺] OVER DOSE"},
-			{"http://g.e-hentai.org/g/127323/042ecd2bf9/","[しのざき嶺] 女教師恥辱の鎖"},
 //			 {"http://g.e-hentai.org/g/887122/8d482670f8/","[折川] 寝取ラレ彼女 私、彼氏の為に犯されます。1-2"},
 //			{"http://g.e-hentai.org/g/37645/4d77a21f6e/","[毛野楊太郎] 輪姦連鎖 ～凌辱遊戯～"},
+//			{"http://g.e-hentai.org/g/892637/481b3874d2/","(C89) [ぶれいんでっど (Eiジ)] モモのハーレム管理術 (ToLOVEる ダークネス)"},
+//			{"http://g.e-hentai.org/g/892590/e32811a1ec/","[久遠ミチヨシ] 絶対★は～れむQUEENS"},
+//			{"http://g.e-hentai.org/g/892603/67f670328d/","(C89) [妄想コロッセオ (織田non)] Hな年上キャラの落描き・ラフ漫画本 (よろず)"},
+//			{"http://g.e-hentai.org/g/892304/0be75ac38f/","[Misaki Yukihiro] Nikuhisyo Yukiko ch. 1 [Digital] [desudesu]"},
+//			{"http://g.e-hentai.org/g/892301/b99b79af52/","[さーくるスパイス] 母親による筆おろしが義務化された世界"},
+//			{"http://g.e-hentai.org/g/835917/34e9218b3e/","[甲斐ひろゆき] 僕の山ノ上村孕ませ日記"},
+//			{"http://g.e-hentai.org/g/112810/76c12ece6e/","[しのざき嶺] NIGHT MARE 2"},
+//			{"http://g.e-hentai.org/g/116139/3c9601ce73/","[しのざき嶺] OVER DOSE"},
+//			{"http://g.e-hentai.org/g/127323/042ecd2bf9/","[しのざき嶺] 女教師恥辱の鎖"},
+			{"http://g.e-hentai.org/g/892411/62ee9667fa/", "[カスガ] 私たちすっぽんぽん〜カスガ作品集〜 [DL版]"},
+			
 	};
 
 	public String lastUrl() {

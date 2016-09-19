@@ -1,4 +1,4 @@
-package sumomodownload;
+package util;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import sumomodownload.TMain;
 
 /**
  * 全て作り直し
